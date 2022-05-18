@@ -68,15 +68,15 @@ Estimated time used for this homework: \textbf{4-5 hours.}
 \section*{0\quad Student Info (0 point)}
 Your name and student id:
 \begin{solution}
-
+    Wang Zining 520370910042
 \end{solution}
 
 \section{Complexity Analysis (28 points)}
 
 \begin{enumerate}[(a)] \label{prb:tiger_code}
 
-\item What is the time complexity of the following function? (6 points)
-\begin{lstlisting}[language=c++]
+    \item What is the time complexity of the following function? (6 points)
+          \begin{lstlisting}[language=c++]
 void question_1a(unsigned int n) {
 	 int result = 0;
 	 for (int i = 1; i < n; i *= 2) {
@@ -88,12 +88,22 @@ void question_1a(unsigned int n) {
 }
 \end{lstlisting}
 
-\begin{solution}
+          \begin{solution}
 
-\end{solution}
+              Outer loop: from $2^0$ to $2^{\log n}$.
 
-\item What is the time complexity of the following function? (6 points)
-\begin{lstlisting}[language=c++]
+              Inner loop: from $1$ to $\sqrt{n}$.
+
+              So,
+              $\Theta((\log n )\times(\sqrt{n}))=\Theta(\log n \sqrt{n})$.
+
+              \[
+                  T(n)=\Theta(\log n \sqrt{n}).
+              \]
+          \end{solution}
+
+    \item What is the time complexity of the following function? (6 points)
+          \begin{lstlisting}[language=c++]
 void question_1b(unsigned int m, unsigned int n, unsigned int p) {
 	 int count = 0;
 	 for (int i = m/2; i < m; i++) {
@@ -108,43 +118,88 @@ void question_1b(unsigned int m, unsigned int n, unsigned int p) {
 }
 \end{lstlisting}
 
-\begin{solution}
+          \begin{solution}
 
-\end{solution}
+              Outer loop: from $\frac{m}{2}$ to $m$.
 
-\item Mr. Blue Tiger wants to create his own version of fibonacci sequence. Since 3 is his favorite number, he decides that any element should be the sum of its previous three elements. Can you help him figure out the time complexity of his recursive function? Select \textbf{All} the answers that are correct, and state your reason. (6 points)
-\begin{lstlisting}[language=c++]
+              First inner loop: from $1$ to $\sqrt{n}$.
+
+              Second inner loop: 0 when p is large.
+
+              So,
+              $\Theta((\frac{m}{2} ) + (\sqrt{n}))=\Theta(m+\sqrt{n})$.
+
+              \[
+                  T(n) =     \Theta(m+\sqrt{n}).
+              \]
+          \end{solution}
+
+    \item Mr. Blue Tiger wants to create his own version of fibonacci sequence. Since 3 is his favorite number, he decides that any element should be the sum of its previous three elements. Can you help him figure out the time complexity of his recursive function? Select \textbf{All} the answers that are correct, and state your reason. (6 points)
+          \begin{lstlisting}[language=c++]
 int TigerNacci(unsigned int n) {
 	if (n <= 3) return 1;
 	return TigerNacci(n - 1) + TigerNacci(n - 2) + TigerNacci(n - 3);
 }
 \end{lstlisting}
-\begin{enumerate}[i)]
-\item $\Theta(n^{3}\log n)$
-\item $\Theta(3^{n}\log n)$
-\item $O(3^{n}\log n)$
-\item $\Theta(3^{n})$
-\item $\Theta(n^{2}\log n)$
-\item $\Theta(2^{n}\log n)$
-\item $O(2^{n}\log n)$
-\item $\Theta(2^{n})$
-\end{enumerate}
-\begin{solution}
-%\vspace{100pt}
-\end{solution}
+          \begin{enumerate}[i)]
+              \item $\Theta(n^{3}\log n)$
+              \item $\Theta(3^{n}\log n)$
+              \item $O(3^{n}\log n)$
+              \item $\Theta(3^{n})$
+              \item $\Theta(n^{2}\log n)$
+              \item $\Theta(2^{n}\log n)$
+              \item $O(2^{n}\log n)$
+              \item $\Theta(2^{n})$
+          \end{enumerate}
+          \begin{solution}
+              %\vspace{100pt}
+              \begin{align*}
+                  T(n)=                 & \begin{cases}   & T(n-1)+T(n-2)+T(n-3), n \geq 4 \\
+                & 1 ,n \leq 3
+                                          \end{cases}              \\
+                  T(n) =                & 2T(n-2)+2T(n-3)+T(n-4)                                        \\ =&
+                  2(T(n-3)+T(n-4)+T(n-5))+2T(n-3)+T(n-4)                                                \\=&
+                  4T(n-3)+3T(n-4)+2T(n-5)                                                               \\
+                  %   4(T(n-4)+T(n-5)+T(n-6))+3T(n-4)+2T(n-5)                  \\ =&
+                  %   7T(n-4)+6T(n-5)+4T(n-6)                                  \\ =&
+                  %   7(T(n-5)+T(n-6)+T(n-7))+6T(n-5)+4T(n-6)                  \\ =&
+                  %   13T(n-5)+11T(n-6)+7T(n-7)                                \\ =&
+                  %   13(T(n-6)+T(n-7)+T(n-8))+11T(n-6)+7T(n-7)                \\ =&
+                  %   24T(n-6)+20T(n-7)+13T(n-8)
+                  T(n-1) =              & 2T(n-3)+2T(n-4)+T(n-5)                                        \\
+                  \frac{T(n)}{T(n-1)} = & \frac{ 4T(n-3)+3T(n-4)+2T(n-5)  }{2T(n-3)+2T(n-4)+T(n-5)} < 2
+              \end{align*}
+              Also we have $T(3) = 1 < 2^3 \log 3<3^3 \log 3$.
 
-\item Sort the following functions with the $\prec$ notation. (10 points)
-\begin{definition}[$\prec$ notation]
-Let $f(n)$ and $g(n)$ be functions from the set of natural numbers to the set of nonnegative real numbers.
-$f(n)$ is said to be $o(g(n))$, written as $f(n)=o(g(n))$, if
-$$\forall c>0,\exists n_{0}:\forall n\ge n_{0},f(n)<c g(n).$$
-Funcitons can be ordered by $\prec$ with its definition: $f\prec g$ iff $f(n)=o(g(n))$. For example,
-$$1 \prec \log n \prec n$$
-\end{definition}
-Sort $(\sqrt{2})^{\log n}, (n+2)!, n^n, 0.2n^{\sqrt{2}},  n^{2/\log n}$ with $\prec$, briefly explain your answer.
-\begin{solution}
-%\vspace{100pt}
-\end{solution}
+              So $T(n)<2^n \log n < 3^n \log n,\forall n>2$.
+              Choose iii) and vii).
+
+              Also, we have $T(n) < a^n,a<2$, so do not choose ii),iv),vi) and viii).
+
+              $ \frac{T(n)}{T(n-1)} = \frac{ 4T(n-3)+3T(n-4)+2T(n-5)  }{2T(n-3)+2T(n-4)+T(n-5)} = 2- \frac{T(n-4)}{2T(n-3)+2T(n-4)+T(n-5)} > 2-1 =1$
+
+              So we can get $T(n) > a^{(n-4)},a>1$, so do not choose i) and v).
+
+              Hence, choose iii) and vii).
+
+          \end{solution}
+
+    \item Sort the following functions with the $\prec$ notation. (10 points)
+          \begin{definition}[$\prec$ notation]
+              Let $f(n)$ and $g(n)$ be functions from the set of natural numbers to the set of nonnegative real numbers.
+              $f(n)$ is said to be $o(g(n))$, written as $f(n)=o(g(n))$, if
+              $$\forall c>0,\exists n_{0}:\forall n\ge n_{0},f(n)<c g(n).$$
+              Funcitons can be ordered by $\prec$ with its definition: $f\prec g$ iff $f(n)=o(g(n))$. For example,
+              $$1 \prec \log n \prec n$$
+          \end{definition}
+          Sort $(\sqrt{2})^{\log n}, (n+2)!, n^n, 0.2n^{\sqrt{2}},  n^{2/\log n}$ with $\prec$, briefly explain your answer.
+          \begin{solution}
+              %\vspace{100pt}
+              $ n^{2/\log n} \prec (\sqrt{2})^{\log n} \prec 0.2n^{\sqrt{2}} \prec (n+2)! \prec n^n$.
+
+
+              $\frac{n^n}{(n+2)!} = \frac{}{(n+2) (n+1) n }$
+          \end{solution}
 \end{enumerate}
 
 \newpage
@@ -153,44 +208,44 @@ Sort $(\sqrt{2})^{\log n}, (n+2)!, n^n, 0.2n^{\sqrt{2}},  n^{2/\log n}$ with $\p
 What is the complexity of the following recurrence relation? (5 points each)
 \begin{enumerate}[(a)]
 
-\item $T(n) = \left\{
-\begin{aligned}
-&c_0, &n=1\\
-&8T\left(\dfrac{n}{2}\right)+(n + 1)(n + 2) + c, &n>1\\
-\end{aligned}
-\right.
-$
+    \item $T(n) = \left\{
+              \begin{aligned}
+                   & c_0,                                            & n=1 \\
+                   & 8T\left(\dfrac{n}{2}\right)+(n + 1)(n + 2) + c, & n>1 \\
+              \end{aligned}
+              \right.
+          $
 
-\begin{solution}
+          \begin{solution}
 
-\end{solution}
+          \end{solution}
 
-\item $T(n) = \left\{
-\begin{aligned}
-&c_0, &n=1\\
-&2T\left(\dfrac{n}{4}\right)+2\log n+\sqrt{n}+c, &n>1\\
-\end{aligned}
-\right.
-$
+    \item $T(n) = \left\{
+              \begin{aligned}
+                   & c_0,                                            & n=1 \\
+                   & 2T\left(\dfrac{n}{4}\right)+2\log n+\sqrt{n}+c, & n>1 \\
+              \end{aligned}
+              \right.
+          $
 
-\begin{solution}
+          \begin{solution}
 
-\end{solution}
+          \end{solution}
 \end{enumerate}
 
 \subsection{Master Theorem on code (10 points)}
 \begin{enumerate}[(a)]
 
-\item 
-Derive the recurrence relation of the TigerNacci function in Problem~\ref{prb:tiger_code}c, then find out its time complexity.
-(Hint: Can you use master theorem here?) (5 points)
-\begin{solution}
-%\vspace{100pt}
-\end{solution}
+    \item
+          Derive the recurrence relation of the TigerNacci function in Problem~\ref{prb:tiger_code}c, then find out its time complexity.
+          (Hint: Can you use master theorem here?) (5 points)
+          \begin{solution}
+              %\vspace{100pt}
+          \end{solution}
 
-\item 
-Based on the function below, answer the following question. \textbf{Assume that $helper(n)$ runs in $O(n^6)$ time.} (5 points)
-\begin{lstlisting}[language=c++]
+    \item
+          Based on the function below, answer the following question. \textbf{Assume that $helper(n)$ runs in $O(n^6)$ time.} (5 points)
+          \begin{lstlisting}[language=c++]
 void problem_2_2_b(int n) {
 	if (n < 3) {
 		return;
@@ -208,7 +263,7 @@ void problem_2_2_b(int n) {
 \end{enumerate}
 Calculate the recurrence relation of this function, then find out its time complexity.
 \begin{solution}
-%\vspace{100pt}
+    %\vspace{100pt}
 \end{solution}
 
 
@@ -219,48 +274,48 @@ Calculate the recurrence relation of this function, then find out its time compl
 Select the most efficient sorting algorithm for each of the following situations. (4 points each)
 \begin{enumerate}[(a)]
     \item You are sorting a set of electronic files. However, they are huge and you found that copying and moving these files are too expensive. So you want to copy and move them as less as possible.
-    \begin{enumerate}[A)]
-        \item insertion sort
-        \item selection sort
-        \item quick sort
-        \item merge sort
-    \end{enumerate}
-    \begin{solution}
-        
-    \end{solution}
-    
+          \begin{enumerate}[A)]
+              \item insertion sort
+              \item selection sort
+              \item quick sort
+              \item merge sort
+          \end{enumerate}
+          \begin{solution}
+
+          \end{solution}
+
     \item Your friend is transmitting a sorted array of integers to you. However, due to some interference, a few integers in the array have changed their position. This causes the sorted array to become a nearly sorted one.
-    \begin{enumerate}[A)]
-        \item insertion sort
-        \item selection sort
-        \item quick sort
-        \item merge sort
-    \end{enumerate}
-    \begin{solution}
-       
-    \end{solution}
-    
+          \begin{enumerate}[A)]
+              \item insertion sort
+              \item selection sort
+              \item quick sort
+              \item merge sort
+          \end{enumerate}
+          \begin{solution}
+
+          \end{solution}
+
     \item You are dealing with a sequence of integers that are stored in a linked list. This means that it is expensive for you to access integer in a specific position.
-    \begin{enumerate}[A)]
-        \item insertion sort
-        \item selection sort
-        \item quick sort
-        \item merge sort
-    \end{enumerate}
-    \begin{solution}
-        
-    \end{solution}
-    
-    \item You are a game programmer in the 1980s. You need to display a relatively small set of the names of defeated enemies in a sorted order as quickly as possible. Since it is old time, the players are used to occasional long time waiting before the display. 
-    \begin{enumerate}[A)]
-        \item insertion sort
-        \item selection sort
-        \item quick sort
-        \item merge sort
-    \end{enumerate}
-    \begin{solution}
-        
-    \end{solution}
+          \begin{enumerate}[A)]
+              \item insertion sort
+              \item selection sort
+              \item quick sort
+              \item merge sort
+          \end{enumerate}
+          \begin{solution}
+
+          \end{solution}
+
+    \item You are a game programmer in the 1980s. You need to display a relatively small set of the names of defeated enemies in a sorted order as quickly as possible. Since it is old time, the players are used to occasional long time waiting before the display.
+          \begin{enumerate}[A)]
+              \item insertion sort
+              \item selection sort
+              \item quick sort
+              \item merge sort
+          \end{enumerate}
+          \begin{solution}
+
+          \end{solution}
 \end{enumerate}
 
 \subsection{Brute force or sorting? (6 points)}
@@ -272,37 +327,37 @@ You need to find 100 richest persons from an unsorted list containing wealth of 
 Which solution would you suggest? Assume the time of linear search for 10 items in an unsorted list takes 10 ns and the time for sorting 10 items takes 10 ns. You can neglect the time to convert the list into an array and the time to fetch data from the sorted array.
 
 \begin{solution}
-%\vspace{150pt}
+    %\vspace{150pt}
 \end{solution}
 
 \section{Improved Insertion Sort (17 points)}
 \subsection{Binary Search (9 points)}
 After Ssy finishes studying sorting algorithm in VE281, he finds himself quite interested about the insertion sort. He quickly implements this sorting algorithm and runs several cases to test his code. However, he finds the performance of this algorithm is not satisfying. Then he decides to improve this insertion sorting algorithm by using binary search instead of linear search. The pseudo code of this algorithm is shown below.
 \begin{algorithm}[H]
-	\textbf{Input}: an integer array a with size n\\
-	\textbf{Output}: the sorted array of a
-	\caption{ImprovedInsertionSort(a[.])}
-	\begin{algorithmic}[1]
-	    \For{i $=$ 1; i $<$ n; i $+=$ 1 }  
-            \State temp = a[i];  
-            \State p = BinarySearch(a, i-1, temp);
-            \For{j $=$ i-1; j $\geq$ p; j $-=$ 1}
-                \State a[j+1] = a[j];
-            \EndFor
-            \State a[j] = temp;
-        \EndFor  
-	\end{algorithmic}  
+    \textbf{Input}: an integer array a with size n\\
+    \textbf{Output}: the sorted array of a
+    \caption{ImprovedInsertionSort(a[.])}
+    \begin{algorithmic}[1]
+        \For{i $=$ 1; i $<$ n; i $+=$ 1 }
+        \State temp = a[i];
+        \State p = BinarySearch(a, i-1, temp);
+        \For{j $=$ i-1; j $\geq$ p; j $-=$ 1}
+        \State a[j+1] = a[j];
+        \EndFor
+        \State a[j] = temp;
+        \EndFor
+    \end{algorithmic}
 \end{algorithm}
 Based on the algorithm above, answer the questions. (3 points each)
 \begin{enumerate}[a)]
     \item How many data moves needed to be done to sort an array of size n in average?
-    What about the worst case?
+          What about the worst case?
     \item How many comparisons needed to be performed to sort an array of size n in average? What about the worst case?
     \item What's time complexity of the binary search part and data moving part, respectively? Is this algorithm better than the one with linear search?
 \end{enumerate}
 
 \begin{solution}
-%\vspace{150pt}
+    %\vspace{150pt}
 \end{solution}
 
 \subsection{Improve by Splitting (8 points)}
@@ -315,7 +370,7 @@ After discussing with Wcy, Ssy discovers that insertion sort works fast for smal
 Analyze the algorithm described above, find the optimal k for given n and time complexity for this algorithm.
 
 \begin{solution}
-%\vspace{150pt}
+    %\vspace{150pt}
 \end{solution}
 
 \section{Sorting Algorithm Design (13 points)}
@@ -328,7 +383,7 @@ Suppose you are designing a aggregator, you will be given two unsorted arrays of
 
 \newpage
 \begin{solution}
-%\vspace{400pt}
+    %\vspace{400pt}
 \end{solution}
 
 
