@@ -9,9 +9,9 @@ while True:
     third = i**i
     forth = 0.2*(i**np.sqrt(2))
     fifth = i**(2/(np.log(i)))
-    print (third/second)
+    print (second/third)
     # print (i,first,second,third,forth,fifth)
     print("\n")
-    i=i*2
-    if (i>1000000) :
+    i=i+1
+    if (i>20) :
         break

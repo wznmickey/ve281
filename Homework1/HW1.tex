@@ -130,7 +130,7 @@ void question_1b(unsigned int m, unsigned int n, unsigned int p) {
               $\Theta((\frac{m}{2} ) + (\sqrt{n}))=\Theta(m+\sqrt{n})$.
 
               \[
-                  T(n) =     \Theta(m+\sqrt{n}).
+                  T(m,n) =     \Theta(m+\sqrt{n}).
               \]
           \end{solution}
 
@@ -154,9 +154,9 @@ int TigerNacci(unsigned int n) {
           \begin{solution}
               %\vspace{100pt}
               \begin{align*}
-                  T(n)=                 & \begin{cases}   & T(n-1)+T(n-2)+T(n-3), n \geq 4 \\
-                & 1 ,n \leq 3
-                                          \end{cases}              \\
+                  T(n)=                 & \begin{cases}     & T(n-1)+T(n-2)+T(n-3), n \geq 4 \\
+                  & 1 ,n \leq 3
+                                          \end{cases}            \\
                   T(n) =                & 2T(n-2)+2T(n-3)+T(n-4)                                        \\ =&
                   2(T(n-3)+T(n-4)+T(n-5))+2T(n-3)+T(n-4)                                                \\=&
                   4T(n-3)+3T(n-4)+2T(n-5)                                                               \\
@@ -198,7 +198,10 @@ int TigerNacci(unsigned int n) {
               $ n^{2/\log n} \prec (\sqrt{2})^{\log n} \prec 0.2n^{\sqrt{2}} \prec (n+2)! \prec n^n$.
 
 
-              $\frac{n^n}{(n+2)!} = \frac{}{(n+2) (n+1) n }$
+              $\lim_{n \to \infty}  \frac{(n+2)!}         {n^n} = 0$,
+              $\lim_{n \to \infty}  \frac{0.2n^{\sqrt{2}}}{(n+2)!} =0   $,
+              $\lim_{n \to \infty}  \frac{(\sqrt{2})^{\log n}}{0.2n^{\sqrt{2}}} =0$,
+              $\lim_{n \to \infty}  \frac{n^{2/\log n}}{(\sqrt{2})^{\log n}} =0$
           \end{solution}
 \end{enumerate}
 
@@ -217,6 +220,8 @@ What is the complexity of the following recurrence relation? (5 points each)
           $
 
           \begin{solution}
+              We have $T(n)=aT(\frac{n}{b}) + \Theta(n^2) $ for $n>1$, where $a=8,b=2,\log_{b} a = 3$.
+              So we have $T(n) = \Theta (n^3)$.
 
           \end{solution}
 
@@ -229,7 +234,8 @@ What is the complexity of the following recurrence relation? (5 points each)
           $
 
           \begin{solution}
-
+              We have $T(n)=aT(\frac{n}{b}) + \Theta(\sqrt{n}) $ for $n>1$, where $a=2,b=4, \log_{b} a = \frac{1}{2}$.
+              So we have $T(n) = \Theta (\sqrt{n} \log n)$.
           \end{solution}
 \end{enumerate}
 
@@ -240,9 +246,17 @@ What is the complexity of the following recurrence relation? (5 points each)
           Derive the recurrence relation of the TigerNacci function in Problem~\ref{prb:tiger_code}c, then find out its time complexity.
           (Hint: Can you use master theorem here?) (5 points)
           \begin{solution}
-              %\vspace{100pt}
-          \end{solution}
+              Solve function $x^3-x^2-x-1=0$ and we can get
+              \[x_1 =\frac{1}{3} \left(\sqrt[3]{3 \sqrt{33}+19}+\sqrt[3]{19-3 \sqrt{33}}+1\right) \approx 1.8\]
+              \[x_2 = -\frac{1}{6} \left(1+i \sqrt{3}\right) \sqrt[3]{3 \sqrt{33}+19}-\frac{1}{6} \left(1-i \sqrt{3}\right) \sqrt[3]{19-3 \sqrt{33}}+\frac{1}{3} \approx -0.4 -0.6i\]
 
+              \[x_3 = -\frac{1}{6} \left(1-i \sqrt{3}\right) \sqrt[3]{3 \sqrt{33}+19}-\frac{1}{6} \left(1+i \sqrt{3}\right) \sqrt[3]{19-3 \sqrt{33}}+\frac{1}{3} \approx -0.4+0.6i\]
+
+              Also apply $T[1]=T[2]=T[3]=1$ we can get $T(n) \approx 1.8 ^n \times 0.2 + (-0.4+0.6i)^n \times (-0.6-0.04i) + (-0.4-0.6i)^n \times (-0.6+0.04i) $.
+
+              Since $|-0.4+0.6i|=|-0.4-0.6i|<1$,
+              we can get \[ T(n) = \Theta\left(\frac{1}{3} \left(\sqrt[3]{3 \sqrt{33}+19}+\sqrt[3]{19-3 \sqrt{33}}+1\right)^n\right). \]
+          \end{solution}
     \item
           Based on the function below, answer the following question. \textbf{Assume that $helper(n)$ runs in $O(n^6)$ time.} (5 points)
           \begin{lstlisting}[language=c++]
@@ -263,7 +277,19 @@ void problem_2_2_b(int n) {
 \end{enumerate}
 Calculate the recurrence relation of this function, then find out its time complexity.
 \begin{solution}
-    %\vspace{100pt}
+    \begin{align*}
+        T(n)=
+         & \begin{cases}
+                & O(n^3) + 281 T(\frac{n}{3}), n > 16 \\
+               % & O(n^6) \times \sqrt{n} O(n^6) + T(\frac{n}{3}), n \leq 16 \\
+                & O(1) ,n \leq 16
+           \end{cases}
+    \end{align*}
+
+    So we can get $T(n) = aT(\frac{n}{b}) + f(n)$, where $a=281,b=3, f(n)= O(n^3)$.
+
+    Hence, $T(n)= O(n^{\log_3 281})$.
+
 \end{solution}
 
 
@@ -281,7 +307,7 @@ Select the most efficient sorting algorithm for each of the following situations
               \item merge sort
           \end{enumerate}
           \begin{solution}
-
+              B
           \end{solution}
 
     \item Your friend is transmitting a sorted array of integers to you. However, due to some interference, a few integers in the array have changed their position. This causes the sorted array to become a nearly sorted one.
@@ -292,7 +318,7 @@ Select the most efficient sorting algorithm for each of the following situations
               \item merge sort
           \end{enumerate}
           \begin{solution}
-
+              A
           \end{solution}
 
     \item You are dealing with a sequence of integers that are stored in a linked list. This means that it is expensive for you to access integer in a specific position.
@@ -303,7 +329,7 @@ Select the most efficient sorting algorithm for each of the following situations
               \item merge sort
           \end{enumerate}
           \begin{solution}
-
+            D
           \end{solution}
 
     \item You are a game programmer in the 1980s. You need to display a relatively small set of the names of defeated enemies in a sorted order as quickly as possible. Since it is old time, the players are used to occasional long time waiting before the display.
@@ -314,7 +340,7 @@ Select the most efficient sorting algorithm for each of the following situations
               \item merge sort
           \end{enumerate}
           \begin{solution}
-
+            C
           \end{solution}
 \end{enumerate}
 
@@ -327,7 +353,12 @@ You need to find 100 richest persons from an unsorted list containing wealth of 
 Which solution would you suggest? Assume the time of linear search for 10 items in an unsorted list takes 10 ns and the time for sorting 10 items takes 10 ns. You can neglect the time to convert the list into an array and the time to fetch data from the sorted array.
 
 \begin{solution}
-    %\vspace{150pt}
+    We can generally get that $T_{l}=10n,T_{s}=n\log_{10} n$.
+    So $T_1 = T_{l} (10000)+T_{l}(9999) + \cdots T_{l}(9901) \approx 100 \times 10 \times 10000 = 10000000$.
+
+    $T_2 = T_s(n) = 10000 \log_{10} 10000 = 40000$.
+
+    So choose ii).
 \end{solution}
 
 \section{Improved Insertion Sort (17 points)}
@@ -357,7 +388,21 @@ Based on the algorithm above, answer the questions. (3 points each)
 \end{enumerate}
 
 \begin{solution}
-    %\vspace{150pt}
+    \section*{a)}
+    This algorithm only improves the process of search from linear search to binary search.
+    So the data move parts have same complexity as insertion sort.
+    
+    In average $O(n^2)$ moves.
+    The worst case needs $O(n^2)$ moves.
+    
+    \section*{b)}
+    Every search need $O(\log n)$ and there is $O(n)$ searches.
+
+    So there is $O(n\log n)$ comparisons. Both average and worst cases.
+
+    \section*{c)}
+    The binary part is $O(\log n) $ and moving part is $O(n)$. It changes the total complexity from $\Theta(n^2)$ to $\Theta(n^2)$, i.e. no change. However, it optimises constant number, so it would be a better algorithm.
+
 \end{solution}
 
 \subsection{Improve by Splitting (8 points)}
@@ -370,7 +415,9 @@ After discussing with Wcy, Ssy discovers that insertion sort works fast for smal
 Analyze the algorithm described above, find the optimal k for given n and time complexity for this algorithm.
 
 \begin{solution}
-    %\vspace{150pt}
+    $T(n) = k (O(\frac{n}{k}))^2 + nk = O(\frac{n^2}{k}+nk) $
+
+    So  when $k=O(\sqrt{n})$, the complexity is the lowest, which is $O(n\sqrt{n})$.
 \end{solution}
 
 \section{Sorting Algorithm Design (13 points)}
@@ -383,8 +430,77 @@ Suppose you are designing a aggregator, you will be given two unsorted arrays of
 
 \newpage
 \begin{solution}
-    %\vspace{400pt}
+    \section*{a)}
+    \begin{algorithm}[H]
+        \textbf{Input}: two integer array a,b with size m,n\\
+        \textbf{Output}: c as the intersection array of a,b
+        \caption{IntersectionArray1}
+        \begin{algorithmic}[1]
+            \State{Quick Sort a,b from smallest to greatest;}
+            \State{i=0;}
+            \State{j=0;}
+            \State{k=0;}
+            \While{$i < m,j<n$}
+            \If{$a[i]<b[j]$}
+                \State i++;
+            \Else
+                \If {$a[i]>b[j]$}
+                    \State j++;
+                \Else
+                    \State c[k]=a[i];
+                    \State i++;
+                    \State  j++;
+                    \State   k++;
+                \EndIf
+            \EndIf
+            \EndWhile
+        \end{algorithmic}
+    \end{algorithm}
+    $O(n\log n + m\ log m +n+m)=O(n\log n + m\ log m)$
+    \section*{b)}
+    \begin{algorithm}[H]
+        \textbf{Input}: two integer array a,b with size m,n\\
+        \textbf{Output}: c as the intersection array of a,b
+        \caption{IntersectionArray2}
+        \begin{algorithmic}[1]
+            \If {$m>n$}
+                \State *a1=b;
+                \State *a2=a;
+            \Else
+                \State *a1=a;
+                \State *a2=b;
+            \EndIf
+            \State{Quick Sort a1;}
+            \State{i=0;}
+            \For {
+                x:a2
+            }
+            \State{flag=BinarySearch(x,a1);}
+            \If{flag==true}
+                \State c[i]=x;
+                \State i++;
+            \EndIf
+            \EndFor
+        \end{algorithmic}
+    \end{algorithm}
+    $O(\min (n,m) \log \min (n,m) + \max (n,m) \log \min (n,m))=O(\min(m\log m + n \log m, m \log n + n \log n))$
+\section*{c)}
+Mathematically, The second one is better unless $m==n$.
+
+$m\log m + n\log n \geq m \log \min (m,n)+n \log \min (m,n) = \min ( m \log m + n\log m, m \log n +n \log n)  $.
+
+So on average, the second one will have better performance.
+
+However, since we ignore constant part and calculate in average, in some cases , the first one may have better performance.
+
+When $n$ and $m$ are not close , the second one will be a better choice.
+
 \end{solution}
 
 
+
+
 \end{document}
+
+
+% VE281_HW1_520370910042_ZiningWang
