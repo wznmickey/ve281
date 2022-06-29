@@ -3,3 +3,8 @@
 *.fls
 *.log
 *.fdb_latexmk
+*.*
+!*.pdf
+!*.tex
+!*.hpp
+!*.cpp
