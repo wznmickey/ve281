@@ -8,10 +8,10 @@ int main()
     // auto i=a.begin();
     // std::advance(i, 2);
 
-    HashTable<string, string, std::hash< string >, std::equal_to< string>> ans;
+    HashTable<int, int, std::hash< int >, std::equal_to< int>> ans;
     while (true)
     {
-        string st1,st2;
+        int st1,st2;
         int i;
         // int i=0;
         std::cin>>i>>st1>>st2;
@@ -25,6 +25,7 @@ int main()
                 cout<<x->first<<x->second<<endl;
             }
         }
+        if (i==4) cout<<ans[st1]<<endl;
     }
     
 }

@@ -356,6 +356,36 @@ Hints: Recall the formula for expectation is $E[X] = \sum_{k} P[X = k]\cdot k < 
 
 \begin{solution}
     % write your answer here
+    \subsection{a}
+    When $i==1$, we must need 1 probes ,so the probability is 0 for $k \geq 1$ and is 1 for $k==0$.
+    If $i==a$($a\geq 1$) state,
+    we have $p\leq 2^{-1} $ that $\max len(c) \geq 1$.
+
+    We have $p \leq 2^{-2}$ that $\max len(c) \geq 2$.
+
+    $\cdots$
+
+    So, for $i==a+1$,
+    the probability that need less or equal to $k$ probes is $2^{-1}+2^{-2}+\cdots +2^{-k} = 1- 2^{-k}$.
+
+    We can get that the probability is at most $2^{-k}$ that the $a+1$ th insertion requires strictly more than $k$ probes.
+
+    Hence, the probability is at most $2^{-k}$ that the $i$ th insertion requires strictly more than $k$ probes.
+    \subsection{b}
+    Let $k=2 \lg n$, we can get $p \leq 2 ^{-2 \lg n}$.
+
+    Also we have $\lim_{n \to \infty} \frac{2^{-2 \lg n}}{\frac{1}{n^2}}=1$.
+
+    So the probability is $O\left(1 / n^{2}\right)$ that the $i$ th insertion requires more than $2 \lg n$ probes.
+    \subsection{c}
+    $\operatorname{Pr}\{X>2 \lg n\}=\Pi_{i=1}^{n} \operatorname{Pr}\left\{X_{i}>2 \lg n\right\} = O(\frac{1}{n}) $.
+
+    \subsection{d}
+    We have $X_{max} = n$.
+
+    So $E[X] < (1-O(\frac{1}{n})) (2 \lg n) + O(\frac{1}{n}) n < 2 \lg n - O(\frac{2 \lg n }{n}) + O(1) =O(\lg n) $.
+
+    Hence the expected length $\mathrm{E}[X]$ of the longest probe sequence is $O(\lg n)$.
 \end{solution}
 
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <bits/stdc++.h>
+#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <exception>
@@ -201,7 +202,7 @@ protected:                                                                    //
      * @throw std::range_error if no such bucket size can be found
      * @param bucketSize lower bound of the new number of buckets
      */
-    size_t findMinimumBucketSize( size_t bucketSize ) const
+    size_t findMinimumBucketSize( const size_t &bucketSize ) const
     {
         // TODO: implement this function
         auto ans = std::max(
@@ -215,9 +216,9 @@ protected:                                                                    //
         return *x;
     }
     // TODO: define your helper functions here if necessary
-    inline void relocate( const typename HashTableData::iterator &x )
+    void relocate( const typename HashTableData::iterator &x )
     {
-        for ( auto i = x; i != buckets.end( ); i++ )
+        for ( auto i = x; i != buckets.end( ); ++i )
         {
             if ( i->begin( ) != i->end( ) )
             {
@@ -297,20 +298,17 @@ public:
     Iterator find( const Key &key )
     {
         // TODO: implement this function
-        auto h  = hash( key ) % buckets.size( );
         auto it = buckets.begin( );
-        std::advance( it, h );
+        std::advance( it, hash( key ) % buckets.size( ) );
         auto sit = it->before_begin( );
-        // Iterator ans( this, it );
         while ( std::next( sit, 1 ) != it->end( ) )
         {
             if ( std::next( sit, 1 )->first == key )
             {
-                auto temp    = Iterator( this, it, sit );
-                temp.endFlag = false;
+                auto temp = Iterator( this, it, sit );
                 return temp;
             }
-            sit++;
+            ++sit;
         }
         auto ans    = Iterator( this, it, sit );
         ans.endFlag = true;
@@ -335,7 +333,7 @@ public:
         if ( it.endFlag )
         {
             it.bucketIt->emplace_after( it.listItBefore, key, value );
-            tableSize++;
+            ++tableSize;
             if ( ( ( double ) tableSize ) / ( ( double ) buckets.size( ) ) >= maxLoadFactor )
             {
                 rehash( tableSize );
@@ -347,12 +345,9 @@ public:
                                     std::distance( ( buckets.begin( ) ), ( firstBucketIt ) ),
                                     std::distance( buckets.begin( ), it.bucketIt ) ) );
             }
-
             return true;
         }
-        auto temp = it.listItBefore;
-        temp++;
-        ( temp )->second = value;
+        ( std::next( it.listItBefore, 1 ) )->second = value;
         return false;
     }
 
@@ -369,8 +364,7 @@ public:
     bool insert( const Key &key, const Value &value )
     {
         // TODO: implement this function
-        auto it = find( key );
-        return insert( it, key, value );
+        return insert( find( key ), key, value );
     }
     /**
      * Erase the key if it exists in the hashtable, otherwise, do nothing
@@ -410,10 +404,9 @@ public:
         {
             return it;
         }
-        auto temp        = ( it.bucketIt )->erase_after( ( it.listItBefore ) );
         auto ans         = Iterator( it );
-        ans.listItBefore = ( temp );
-        tableSize--;
+        ans.listItBefore = ( ( it.bucketIt )->erase_after( ( it.listItBefore ) ) );
+        --tableSize;
         return ans;
     }
 
@@ -451,25 +444,32 @@ public:
     {
         // TODO: implement this function
         bucketSize = findMinimumBucketSize( bucketSize );
-        if ( bucketSize == buckets.size( ) )
+        auto temp  = buckets.size( );
+        if ( bucketSize == temp )
         {
             return;
         }
-        if ( buckets.size( ) < bucketSize )
+        if ( bucketSize > temp )
         {
             this->buckets.resize( bucketSize );
         }
-        std::vector< size_t > ans( bucketSize, 0 );
-        for ( size_t i = 0; i < buckets.size( ); i++ )
+        size_t minH = temp;
+        for ( size_t i = 0; i < temp; ++i )
         {
-            for ( auto j = std::next( buckets [ i ].begin( ), ans [ i ] ); j != buckets [ i ].end( ); j++ )
+            for ( auto j = buckets [ i ].before_begin( ); std::next( j, 1 ) != buckets [ i ].end( ); )
             {
-                buckets.at( hash( j->first ) % bucketSize ).push_front( *j );
-                ans [ hash( j->first ) % bucketSize ]++;
+                auto h = hash( std::next( j, 1 )->first ) % bucketSize;
+                minH   = std::min( minH, h );
+                if ( h == i )
+                {
+                    ++j;
+                    continue;
+                }
+                buckets [ h ].splice_after( buckets [ h ].before_begin( ), buckets [ i ], j );
             }
-            buckets [ i ].erase_after( std::next( buckets [ i ].before_begin( ), ans [ i ] ), buckets [ i ].end( ) );
         }
-        relocate( buckets.begin( ) );
+        this->buckets.resize( bucketSize );
+        firstBucketIt = std::next( buckets.begin( ), static_cast< typename HashTableData::difference_type >( minH ) );
         return;
     }
 
