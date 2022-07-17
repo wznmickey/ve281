@@ -81,9 +81,6 @@ public:
                 node = node->left;
             }
             return node;
-            // if ( node->left != nullptr )
-            //     return leftMost( node->left );
-            // return node;
         }
         Node *rightMost( Node *node )
         {
@@ -92,9 +89,6 @@ public:
                 node = node->right;
             }
             return node;
-            // if ( node->right != nullptr )
-            //     return rightMost( node->right );
-            // return node;
         }
 
         /**
@@ -111,9 +105,6 @@ public:
             }
             else
             {
-                // if ( node->parent != nullptr )
-                // {
-                // auto temp = node;
                 if ( node == rightMost( tree->root ) )
                 {
                     node = nullptr;
@@ -126,11 +117,6 @@ public:
                 }
                 node = node->parent;
 
-                // if (node->parent!=nullptr)
-                // {
-
-                // }
-
                 while ( ( node->parent != nullptr ) && ( node->parent->right == node ) )
                 {
                     node = node->parent;
@@ -139,7 +125,6 @@ public:
                 {
                     node = node->parent;
                 }
-                // }
             }
         }
 
@@ -245,23 +230,6 @@ protected:                     // DO NOT USE private HERE!
     size_t treeSize = 0;       // size of the tree
 
     /**
-     * Find the node with key
-     * Time Complexity: O(k log n)
-     * @tparam DIM current dimension of node
-     * @param key
-     * @param node
-     * @return the node with key, or nullptr if not found
-     */
-
-    // template < size_t DIM, typename Compare >
-    // static bool compareKeySelf( const Key &a, const Key &b, Compare compare = Compare( ) )
-    // {
-    //     // if (std::get< DIM >( a )!=std::get< DIM >( b))
-    //     // return compare( std::get< DIM >( a ), std::get< DIM >( b ) );
-    //     return compare( a, b );
-    // }
-
-    /**
      * Compare two keys on a dimension
      * Time Complexity: O(1)
      * @tparam DIM comparison dimension
@@ -284,11 +252,7 @@ protected:                     // DO NOT USE private HERE!
     template < size_t DIM, typename Compare >
     static bool compareKeyTest( const Key &a, const Key &b, Compare compare = Compare( ) )
     {
-        // if ( std::get< DIM >( a ) != std::get< DIM >( b ) )
-        // {
         return compare( std::get< DIM >( a ), std::get< DIM >( b ) );
-        // }
-        // return compare( a, b );
     }
 
     template < size_t DIM > static bool compareKey( const std::pair< Key, Value > &a, const std::pair< Key, Value > &b )
@@ -299,11 +263,7 @@ protected:                     // DO NOT USE private HERE!
     template < size_t DIM, typename Compare >
     static bool compareKeySpecial( const Key &a, const Key &b, Compare compare = Compare( ) )
     {
-        // if ( std::get< DIM >( a ) != std::get< DIM >( b ) )
-        // {
         return compare( std::get< DIM >( a ), std::get< DIM >( b ) );
-        // }
-        // return compare( a, b );
     }
 
     template < size_t DIM > Node *find( const Key &key, Node *node )
@@ -319,34 +279,12 @@ protected:                     // DO NOT USE private HERE!
         {
             return node;
         }
-        if ( compareKeyTest< DIM, std::less<> >( key, node->data.first ) )
+        if ( compareKeySpecial< DIM, std::less<> >( key, node->data.first ) )
         {
             return find< DIM_NEXT >( key, node->left );
         }
         return find< DIM_NEXT >( key, node->right );
     }
-    // bool true -> left
-    // bool false ->right
-    // template < size_t DIM >
-    // std::tuple< Node *, Node *, bool > parentFind( const Key &key, Node *node, Node *parent, const bool p )
-    // {
-    //     constexpr size_t DIM_NEXT = ( DIM + 1 ) % KeySize;
-    //     // TODO: implement this function
-
-    //     if ( node == nullptr )
-    //     {
-    //         return { nullptr, parent, p };
-    //     }
-    //     if ( compareKey< DIM, std::less<> >( key, node->data.first ) )
-    //     {
-    //         return parentFind< DIM_NEXT >( key, node->left, node, true );
-    //     }
-    //     if ( key == node->data.first )
-    //     {
-    //         return { node, nullptr, p }; // only the first value should be used
-    //     }
-    //     return parentFind< DIM_NEXT >( key, node->right, node, false );
-    // }
 
     /**
      * Insert the key-value pair, if the key already exists, replace the value only
@@ -361,63 +299,26 @@ protected:                     // DO NOT USE private HERE!
 
     template < size_t DIM > bool insert( const Key &key, const Value &value, Node *&node, Node *parent )
     {
-        // std::cout << "insert" << std::get< 0 >( key ) << " " << std::get< 1 >( key ) << " " << std::get< 2 >( key );
-        // std::cout << value << std::endl;
         if ( node == nullptr )
         {
             treeSize++;
             node = new Node( key, value, parent );
-            // if ( parent != nullptr )
-            // {
-            //     if ( path )
-            //         parent->left = temp;
-            //     else
-            //         parent->right = temp;
-            // }
-            // root      = temp;
             return true;
         }
         constexpr size_t DIM_NEXT = ( DIM + 1 ) % KeySize;
         // TODO: implement this function
-        // auto temp = parentFind< DIM >( key, node, parent, false );
-        // if ( std::get< 0 >( temp ) != nullptr )
-        // {
-        //     ( std::get< 0 >( temp )->data ).second = value;
-        //     return false;
-        // }
-        // auto ans = new Node( key, value, std::get< 1 >( temp ) );
-        // if ( std::get< 2 >( temp ) )
-        // {
-        //     std::get< 1 >( temp )->left = ans;
-        // }
-        // else
-        // {
-        //     std::get< 1 >( temp )->right = ans;
-        // }
-        // return true;
 
         if ( key == node->data.first )
         {
             node->data.second = value;
             return false;
         }
-        if ( compareKeyTest< DIM, std::less<> >( key, node->data.first ) )
-        // if ( std::get< DIM >( key ) < std::get< DIM >( node->data.first ) )
+        if ( compareKeySpecial< DIM, std::less<> >( key, node->data.first ) )
         {
             return insert< DIM_NEXT >( key, value, node->left, node );
         }
         return insert< DIM_NEXT >( key, value, node->right, node );
     }
-
-    // template < size_t DIM, typename Compare >
-    // static bool compareKeyEqual( const Key &a, const Key &b, Compare compare = Compare( ) )
-    // {
-    // if ( std::get< DIM >( a ) != std::get< DIM >( b ) )
-    // {
-    // return compare( std::get< DIM >( a ), std::get< DIM >( b ) );
-    // }
-    // return compare( a, b );
-    // }
 
     /**
      * Compare two nodes on a dimension
@@ -441,33 +342,6 @@ protected:                     // DO NOT USE private HERE!
     {
         return compareNode< DIM, std::less<> >( a, b );
     }
-    // template < size_t DIM, typename Compare >
-    // static Node *compareNodeEqual( Node *a, Node *b, Compare compare = Compare( ) )
-    // {
-    // if ( ! a )
-    // return b;
-    // if ( ! b )
-    // return a;
-    // return compareKeyEqual< DIM, Compare >( a->key( ), b->key( ), compare ) ? a : b;
-    // }
-
-    // template < size_t DIM >
-    // static bool compareNodeBool( const std::pair< Key, Value > &a, const std::pair< Key, Value > &b )
-    // {
-    //     return compareKey< DIM, std::less<> >( a.first, b.first );
-    // }
-    // template < typename Compare >
-    // static bool compareKeySimpleHelp(
-    // const std::pair< Key, Value > &a,
-    // const std::pair< Key, Value > &b,
-    // Compare                        compare = Compare( ) )
-    // {
-    // return compare( a.first, b.first );
-    // }
-    // static bool compareKeySimple( const std::pair< Key, Value > &a, const std::pair< Key, Value > &b )
-    // {
-    // return compareKeySimpleHelp< std::less<> >( a, b );
-    // }
 
     static bool sameKey( const std::pair< Key, Value > &a, const std::pair< Key, Value > &b )
     {
@@ -490,33 +364,12 @@ protected:                     // DO NOT USE private HERE!
         {
             return node;
         }
-        auto              temp1 = findMin< DIM_CMP, DIM_NEXT >( node->left );
-        decltype( temp1 ) temp2 = nullptr;
+        auto temp1 = findMin< DIM_CMP, DIM_NEXT >( node->left );
         if ( DIM != DIM_CMP )
         {
-            temp2 = findMin< DIM_CMP, DIM_NEXT >( node->right );
-            // if ( temp1 == nullptr )
-            // {
-            //     temp1 = temp2;
-            // }
-            // if ( ( temp1 != nullptr ) && ( temp2 != nullptr )
-            //      && ( std::get< DIM_CMP >( temp1->key( ) ) > std::get< DIM_CMP >( temp2->key( ) ) ) )
-            // {
-            //     temp1 = temp2;
-            // }
-            temp1 = compareNode< DIM_CMP, std::less<> >( temp1, temp2 );
+            temp1 = compareNode< DIM_CMP, std::less<> >( temp1, findMin< DIM_CMP, DIM_NEXT >( node->right ) );
         }
-        // if ( temp1 == nullptr )
-        // {
-        //     temp1 = node;
-        // }
-        // if ( ( temp1 != nullptr ) && ( node != nullptr )
-        //      && ( std::get< DIM_CMP >( temp1->key( ) ) > std::get< DIM_CMP >( node->key( ) ) ) )
-        // {
-        //     temp1 = node;
-        // }
-        temp1 = compareNode< DIM_CMP, std::less<> >( temp1, node );
-        return temp1;
+        return compareNode< DIM_CMP, std::less<> >( temp1, node );
     }
 
     /**
@@ -532,37 +385,15 @@ protected:                     // DO NOT USE private HERE!
         constexpr size_t DIM_NEXT = ( DIM + 1 ) % KeySize;
         // TODO: implement this function
         if ( node == nullptr )
+        {
             return node;
-
-        auto              temp1 = findMax< DIM_CMP, DIM_NEXT >( node->right );
-        decltype( temp1 ) temp2 = nullptr;
+        }
+        auto temp1 = findMax< DIM_CMP, DIM_NEXT >( node->right );
         if ( DIM != DIM_CMP )
         {
-            temp2 = findMax< DIM_CMP, DIM_NEXT >( node->left );
-            temp1 = compareNode< DIM_CMP, std::greater<> >( temp1, temp2 );
-
-            // if ( temp1 == nullptr )
-            // {
-            //     temp1 = temp2;
-            // }
-            // if ( ( temp1 != nullptr ) && ( temp2 != nullptr )
-            //      && ( std::get< DIM_CMP >( temp1->key( ) ) < std::get< DIM_CMP >( temp2->key( ) ) ) )
-            // {
-            //     temp1 = temp2;
-            // }
+            temp1 = compareNode< DIM_CMP, std::greater<> >( temp1, findMax< DIM_CMP, DIM_NEXT >( node->left ) );
         }
 
-        // if ( temp1 == nullptr )
-        // {
-        //     temp1 = node;
-        // }
-        // if ( ( temp1 != nullptr ) && ( node != nullptr )
-        //      && ( std::get< DIM_CMP >( temp1->key( ) ) < std::get< DIM_CMP >( node->key( ) ) ) )
-        // {
-        //     temp1 = node;
-        // }
-
-        // return temp1;
         return compareNode< DIM_CMP, std::greater<> >( temp1, node );
     }
 
@@ -608,10 +439,8 @@ protected:                     // DO NOT USE private HERE!
         }
         if ( key == node->data.first )
         {
-            // std::cout<<"here"<<std::endl;
             if ( ( ( node->left ) == nullptr ) && ( ( node->right ) == nullptr ) )
             {
-                // std::cout<<"there"<<std::endl;
                 delete node;
                 treeSize--;
                 return nullptr;
@@ -679,15 +508,7 @@ public:
         {
             return new Node( left->first, ( left )->second, parent );
         }
-        // size_t mid;
-        // if ( std::distance( left, right ) % 2 == 1 )
-        // {
-        //     mid = ;
-        // }
-        // else
-        // {
-        //     mid = std::distance( left, right ) / 2;
-        // }
+
         auto tempIt = left + std::distance( left, right ) / 2;
         std::nth_element( left, tempIt, right, compareKey< DIM > );
         auto temp   = new Node( ( tempIt )->first, ( tempIt )->second, parent );
@@ -703,11 +524,6 @@ public:
         v.erase( v.begin( ), temp );
         this->root     = KDTree_help< 0 >( v, nullptr, v.begin( ), v.end( ) );
         this->treeSize = v.size( );
-
-        // for ( auto i : v )
-        // {
-        //     insert( i.first, i.second );
-        // }
         return;
     }
 
@@ -732,12 +548,10 @@ public:
     KDTree( const KDTree &that )
     {
         // TODO: implement this function
-        // delete this;
         if ( ( this->root ) != nullptr )
         {
             nodeFree( this->root );
         }
-
         this->root     = copy( ( ( that.root ) ), nullptr );
         this->treeSize = that.treeSize;
         return;
