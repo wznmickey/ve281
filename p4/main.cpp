@@ -5,7 +5,7 @@ using namespace std;
 int main () {
 	ShortestP2P a;
 	a.readGraph();
-
+	std::cout<<"end"<<std::endl;
 	int A, B;
 
 	cin >> A;

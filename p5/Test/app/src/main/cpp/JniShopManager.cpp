@@ -37,7 +37,7 @@ struct _LIBCPP_TEMPLATE_VIS lessPrice : binary_function<JniShop *, JniShop *, bo
 };
 
 void ShopManager::orderByPrice() {
-    quick_sort_inplace(*innerVector, lessPrice());
+    bubble_sort(*innerVector, lessPrice());
 }
 
 struct _LIBCPP_TEMPLATE_VIS GreaterRating : binary_function<JniShop *, JniShop *, bool> {
@@ -47,7 +47,7 @@ struct _LIBCPP_TEMPLATE_VIS GreaterRating : binary_function<JniShop *, JniShop *
 };
 
 void ShopManager::orderByRating() {
-    quick_sort_inplace(*innerVector, GreaterRating());
+    bubble_sort(*innerVector, GreaterRating());
 }
 
 long ShopManager::findByLocation(jint x, jint y, jint distance) {

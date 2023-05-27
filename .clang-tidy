@@ -1,5 +1,6 @@
 {
-        Checks: bugprone*,
+        Checks: portability*,
+        bugprone*,
         clang-analyzer*,
         concurrency*,
         cppcoreguidelines*,

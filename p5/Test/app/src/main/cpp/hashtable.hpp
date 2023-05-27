@@ -1,9 +1,19 @@
 #include "hash_prime.hpp"
 
+#include <algorithm>
+//#include <bits/stdc++.h>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
 #include <exception>
-#include <functional>
-#include <vector>
 #include <forward_list>
+#include <functional>
+#include <iostream>
+#include <iterator>
+#include <string>
+#include <unistd.h>
+#include <utility>
+#include <vector>
 
 /**
  * The Hashtable class
@@ -15,126 +25,150 @@
  * @tparam Hash         function object, return the hash value of a key
  * @tparam KeyEqual     function object, return whether two keys are the same
  */
-template<
-        typename Key, typename Value,
-        typename Hash = std::hash<Key>,
-        typename KeyEqual = std::equal_to<Key>
->
-class HashTable {
+// #define Key      std::string
+// #define Value    std::string
+// #define Hash     std::hash< std::string >
+// #define KeyEqual std::equal_to< std::string >
+
+template < typename Key, typename Value, typename Hash = std::hash< Key >, typename KeyEqual = std::equal_to< Key > >
+class HashTable
+{
 public:
-    typedef std::pair<const Key, Value> HashNode;
-    typedef std::forward_list<HashNode> HashNodeList;
-    typedef std::vector<HashNodeList> HashTableData;
+    typedef std::pair< const Key, Value > HashNode;
+    typedef std::forward_list< HashNode > HashNodeList;
+    typedef std::vector< HashNodeList >   HashTableData;
 
     /**
      * A single directional iterator for the hashtable
      * ! DO NOT NEED TO MODIFY THIS !
      */
-    class Iterator {
+    class Iterator
+    {
     private:
         typedef typename HashTableData::iterator VectorIterator;
-        typedef typename HashNodeList::iterator ListIterator;
+        typedef typename HashNodeList::iterator  ListIterator;
 
         const HashTable *hashTable;
-        VectorIterator bucketIt;    // an iterator of the buckets
-        ListIterator listItBefore;  // a before iterator of the list, here we use "before" for quick erase and insert
-        bool endFlag = false;       // whether it is an end iterator
+        VectorIterator   bucketIt;     // an iterator of the buckets
+        ListIterator     listItBefore; // a before iterator of the list, here we use "before" for quick erase and insert
+        bool             endFlag = false; // whether it is an end iterator
 
         /**
          * Increment the iterator
          * Time complexity: Amortized O(1)
          */
-        void increment() {
-            if (bucketIt == hashTable->buckets.end()) {
+        void increment( )
+        {
+            if ( bucketIt == hashTable->buckets.end( ) )
+            {
                 endFlag = true;
                 return;
             }
             auto newListItBefore = listItBefore;
             ++newListItBefore;
-            if (newListItBefore != bucketIt->end()) {
-                if (++newListItBefore != bucketIt->end()) {
+            if ( newListItBefore != bucketIt->end( ) )
+            {
+                if ( ++newListItBefore != bucketIt->end( ) )
+                {
                     // use the next element in the current forward_list
                     ++listItBefore;
                     return;
                 }
             }
-            while (++bucketIt != hashTable->buckets.end()) {
-                if (!bucketIt->empty()) {
+            while ( ++bucketIt != hashTable->buckets.end( ) )
+            {
+                if ( ! bucketIt->empty( ) )
+                {
                     // use the first element in a new forward_list
-                    listItBefore = bucketIt->before_begin();
+                    listItBefore = bucketIt->before_begin( );
                     return;
                 }
             }
             endFlag = true;
         }
 
-        explicit Iterator(HashTable *hashTable) : hashTable(hashTable) {
-            bucketIt = hashTable->buckets.begin();
-            listItBefore = bucketIt->before_begin();
-            endFlag = bucketIt == hashTable->buckets.end();
+        explicit Iterator( HashTable *hashTable )
+            : hashTable( hashTable )
+        {
+            bucketIt     = hashTable->buckets.begin( );
+            listItBefore = bucketIt->before_begin( );
+            endFlag      = bucketIt == hashTable->buckets.end( );
         }
 
-        Iterator(HashTable *hashTable, VectorIterator vectorIt, ListIterator listItBefore) :
-                hashTable(hashTable), bucketIt(vectorIt), listItBefore(listItBefore) {
-            endFlag = bucketIt == hashTable->buckets.end();
+        Iterator( HashTable *hashTable, VectorIterator vectorIt, ListIterator listItBefore )
+            : hashTable( hashTable )
+            , bucketIt( vectorIt )
+            , listItBefore( listItBefore )
+        {
+            endFlag = bucketIt == hashTable->buckets.end( );
         }
 
     public:
         friend class HashTable;
 
-        Iterator() = delete;
+        Iterator( ) = delete;
 
-        Iterator(const Iterator &) = default;
+        Iterator( const Iterator & ) = default;
 
-        Iterator &operator=(const Iterator &) = default;
+        Iterator &operator=( const Iterator & ) = default;
 
-        Iterator &operator++() {
-            increment();
+        Iterator &operator++( )
+        {
+            increment( );
             return *this;
         }
 
-        Iterator operator++(int) {
+        Iterator operator++( int )
+        {
             Iterator temp = *this;
-            increment();
+            increment( );
             return temp;
         }
 
-        bool operator==(const Iterator &that) const {
-            if (endFlag && that.endFlag) return true;
-            if (bucketIt != that.bucketIt) return false;
+        bool operator==( const Iterator &that ) const
+        {
+            if ( endFlag && that.endFlag )
+                return true;
+            if ( bucketIt != that.bucketIt )
+                return false;
             return listItBefore == that.listItBefore;
         }
 
-        bool operator!=(const Iterator &that) const {
-            if (endFlag && that.endFlag) return false;
-            if (bucketIt != that.bucketIt) return true;
+        bool operator!=( const Iterator &that ) const
+        {
+            if ( endFlag && that.endFlag )
+                return false;
+            if ( bucketIt != that.bucketIt )
+                return true;
             return listItBefore != that.listItBefore;
         }
 
-        HashNode *operator->() {
+        HashNode *operator->( )
+        {
             auto listIt = listItBefore;
             ++listIt;
-            return &(*listIt);
+            return &( *listIt );
         }
 
-        HashNode &operator*() {
+        HashNode &operator*( )
+        {
             auto listIt = listItBefore;
             ++listIt;
             return *listIt;
         }
     };
 
-protected:                                                                  // DO NOT USE private HERE!
-    static constexpr double DEFAULT_LOAD_FACTOR = 0.5;                      // default maximum load factor is 0.5
-    static constexpr size_t DEFAULT_BUCKET_SIZE = HashPrime::g_a_sizes[0];  // default number of buckets is 5
+protected:                                                                    // DO NOT USE private HERE!
+    static constexpr double DEFAULT_LOAD_FACTOR = 0.5;                        // default maximum load factor is 0.5
+    static constexpr size_t DEFAULT_BUCKET_SIZE = HashPrime::g_a_sizes [ 0 ]; // default number of buckets is 5
 
-    HashTableData buckets;                                                  // buckets, of singly linked lists
-    typename HashTableData::iterator firstBucketIt;                         // help get begin iterator in O(1) time
+    HashTableData                    buckets;       // buckets, of singly linked lists
+    typename HashTableData::iterator firstBucketIt; // help get begin iterator in O(1) time
 
-    size_t tableSize;                                                       // number of elements
-    double maxLoadFactor;                                                   // maximum load factor
-    Hash hash;                                                              // hash function instance
-    KeyEqual keyEqual;                                                      // key equal function instance
+    size_t   tableSize;     // number of elements
+    double   maxLoadFactor; // maximum load factor
+    Hash     hash;          // hash function instance
+    KeyEqual keyEqual;      // key equal function instance
 
     /**
      * Time Complexity: O(k)
@@ -142,8 +176,9 @@ protected:                                                                  // D
      * @param bucketSize
      * @return the hash value of key with a new bucket size
      */
-    inline size_t hashKey(const Key &key, size_t bucketSize) const {
-        return hash(key) % bucketSize;
+    size_t hashKey( const Key &key, size_t bucketSize ) const
+    {
+        return hash( key ) % bucketSize;
     }
 
     /**
@@ -151,8 +186,9 @@ protected:                                                                  // D
      * @param key
      * @return the hash value of key with current bucket size
      */
-    inline size_t hashKey(const Key &key) const {
-        return hash(key) % buckets.size();
+    size_t hashKey( const Key &key ) const
+    {
+        return hash( key ) % buckets.size( );
     }
 
     /**
@@ -166,47 +202,78 @@ protected:                                                                  // D
      * @throw std::range_error if no such bucket size can be found
      * @param bucketSize lower bound of the new number of buckets
      */
-    size_t findMinimumBucketSize(size_t bucketSize) const {
+    size_t findMinimumBucketSize( const size_t &bucketSize ) const
+    {
         // TODO: implement this function
+        auto ans = std::max(
+            bucketSize,
+            static_cast< size_t >(
+                std::floor( ( ( long double ) tableSize ) / ( ( long double ) maxLoadFactor ) ) + 1 ) );
+        const auto *x = std::lower_bound(
+            HashPrime::g_a_sizes,
+            HashPrime::g_a_sizes + HashPrime::num_distinct_sizes_64_bit,
+            ans );
+        return *x;
     }
-
     // TODO: define your helper functions here if necessary
-
+    void relocate( const typename HashTableData::iterator &x )
+    {
+        for ( auto i = x; i != buckets.end( ); ++i )
+        {
+            if ( i->begin( ) != i->end( ) )
+            {
+                firstBucketIt = i;
+                return;
+            }
+        }
+    }
 
 public:
-    HashTable() :
-            buckets(DEFAULT_BUCKET_SIZE), tableSize(0), maxLoadFactor(DEFAULT_LOAD_FACTOR),
-            hash(Hash()), keyEqual(KeyEqual()) {
-        firstBucketIt = buckets.end();
+    HashTable( )
+        : buckets( DEFAULT_BUCKET_SIZE )
+        , tableSize( 0 )
+        , maxLoadFactor( DEFAULT_LOAD_FACTOR )
+        , hash( Hash( ) )
+        , keyEqual( KeyEqual( ) )
+    {
+        firstBucketIt = buckets.end( );
     }
 
-    explicit HashTable(size_t bucketSize) :
-            tableSize(0), maxLoadFactor(DEFAULT_LOAD_FACTOR),
-            hash(Hash()), keyEqual(KeyEqual()) {
-        bucketSize = findMinimumBucketSize(bucketSize);
-        buckets.resize(bucketSize);
-        firstBucketIt = buckets.end();
+    explicit HashTable( size_t bucketSize )
+        : tableSize( 0 )
+        , maxLoadFactor( DEFAULT_LOAD_FACTOR )
+        , hash( Hash( ) )
+        , keyEqual( KeyEqual( ) )
+    {
+        bucketSize = findMinimumBucketSize( bucketSize );
+        buckets.resize( bucketSize );
+        firstBucketIt = buckets.end( );
     }
 
-    HashTable(const HashTable &that) {
-        // TODO: implement this function
-    }
+    HashTable( const HashTable &that ) = default;
+    // {
+    // TODO: implement this function
+    // }
 
-    HashTable &operator=(const HashTable &that) {
-        // TODO: implement this function
-    };
+    HashTable &operator=( const HashTable &that ) = default;
+    // {
+    // TODO: implement this function
+    // };
 
-    ~HashTable() = default;
+    ~HashTable( ) = default;
 
-    Iterator begin() {
-        if (firstBucketIt != buckets.end()) {
-            return Iterator(this, firstBucketIt, firstBucketIt->before_begin());
+    Iterator begin( )
+    {
+        if ( firstBucketIt != buckets.end( ) )
+        {
+            return Iterator( this, firstBucketIt, firstBucketIt->before_begin( ) );
         }
-        return end();
+        return end( );
     }
 
-    Iterator end() {
-        return Iterator(this, buckets.end(), buckets.begin()->before_begin());
+    Iterator end( )
+    {
+        return Iterator( this, buckets.end( ), buckets.begin( )->before_begin( ) );
     }
 
     /**
@@ -215,8 +282,9 @@ public:
      * @param key
      * @return whether the key exists in the hashtable
      */
-    bool contains(const Key &key) {
-        return find(key) != end();
+    bool contains( const Key &key )
+    {
+        return find( key ) != end( );
     }
 
     /**
@@ -227,8 +295,24 @@ public:
      * @param key
      * @return a pair (success, iterator of the value)
      */
-    Iterator find(const Key &key) {
+    Iterator find( const Key &key )
+    {
         // TODO: implement this function
+        auto it = buckets.begin( );
+        std::advance( it, hash( key ) % buckets.size( ) );
+        auto sit = it->before_begin( );
+        while ( std::next( sit, 1 ) != it->end( ) )
+        {
+            if ( std::next( sit, 1 )->first == key )
+            {
+                auto temp = Iterator( this, it, sit );
+                return temp;
+            }
+            ++sit;
+        }
+        auto ans    = Iterator( this, it, sit );
+        ans.endFlag = true;
+        return ans;
     }
 
     /**
@@ -243,8 +327,28 @@ public:
      * @param value
      * @return whether insertion took place (return false if the key already exists)
      */
-    bool insert(const Iterator &it, const Key &key, const Value &value) {
+    bool insert( const Iterator &it, const Key &key, const Value &value )
+    {
         // TODO: implement this function
+        if ( it.endFlag )
+        {
+            it.bucketIt->emplace_after( it.listItBefore, key, value );
+            ++tableSize;
+            if ( ( ( double ) tableSize ) / ( ( double ) buckets.size( ) ) >= maxLoadFactor )
+            {
+                rehash( tableSize );
+            }
+            else
+            {
+                firstBucketIt = buckets.begin( )
+                                + ( std::min(
+                                    std::distance( ( buckets.begin( ) ), ( firstBucketIt ) ),
+                                    std::distance( buckets.begin( ), it.bucketIt ) ) );
+            }
+            return true;
+        }
+        ( std::next( it.listItBefore, 1 ) )->second = value;
+        return false;
     }
 
     /**
@@ -257,10 +361,11 @@ public:
      * @param value
      * @return whether insertion took place (return false if the key already exists)
      */
-    bool insert(const Key &key, const Value &value) {
+    bool insert( const Key &key, const Value &value )
+    {
         // TODO: implement this function
+        return insert( find( key ), key, value );
     }
-
     /**
      * Erase the key if it exists in the hashtable, otherwise, do nothing
      * DO NOT rehash in this function
@@ -269,10 +374,21 @@ public:
      * @param key
      * @return whether the key exists
      */
-    bool erase(const Key &key) {
+    bool erase( const Key &key )
+    {
         // TODO: implement this function
+        auto it = find( key );
+        if ( it.endFlag )
+        {
+            return false;
+        }
+        erase( it );
+        if ( firstBucketIt == it.bucketIt )
+        {
+            relocate( firstBucketIt );
+        }
+        return true;
     }
-
     /**
      * Erase the key at the input iterator
      * If the input iterator is the end iterator, do nothing and return the input iterator directly
@@ -281,8 +397,17 @@ public:
      * @param it
      * @return the iterator after the input iterator before the erase
      */
-    Iterator erase(const Iterator &it) {
+    Iterator erase( const Iterator &it )
+    {
         // TODO: implement this function
+        if ( it.endFlag )
+        {
+            return it;
+        }
+        auto ans         = Iterator( it );
+        ans.listItBefore = ( ( it.bucketIt )->erase_after( ( it.listItBefore ) ) );
+        --tableSize;
+        return ans;
     }
 
     /**
@@ -294,8 +419,16 @@ public:
      * @param key
      * @return reference of value
      */
-    Value &operator[](const Key &key) {
+    Value &operator[]( const Key &key )
+    {
         // TODO: implement this function
+        auto it = find( key );
+        if ( it.endFlag )
+        {
+            insert( it, key, Value( ) );
+            return ( find( key )->second );
+        }
+        return ( it->second );
     }
 
     /**
@@ -307,44 +440,83 @@ public:
      * Time Complexity: O(nk)
      * @param bucketSize lower bound of the new number of buckets
      */
-    void rehash(size_t bucketSize) {
-        bucketSize = findMinimumBucketSize(bucketSize);
-        if (bucketSize == buckets.size()) return;
+    void rehash( size_t bucketSize )
+    {
         // TODO: implement this function
+        bucketSize = findMinimumBucketSize( bucketSize );
+        auto temp  = buckets.size( );
+        if ( bucketSize == temp )
+        {
+            return;
+        }
+        if ( bucketSize > temp )
+        {
+            this->buckets.resize( bucketSize );
+        }
+        size_t minH = temp;
+        for ( size_t i = 0; i < temp; ++i )
+        {
+            for ( auto j = buckets [ i ].before_begin( ); std::next( j, 1 ) != buckets [ i ].end( ); )
+            {
+                auto h = hash( std::next( j, 1 )->first ) % bucketSize;
+                minH   = std::min( minH, h );
+                if ( h == i )
+                {
+                    ++j;
+                    continue;
+                }
+                buckets [ h ].splice_after( buckets [ h ].before_begin( ), buckets [ i ], j );
+            }
+        }
+        this->buckets.resize( bucketSize );
+        firstBucketIt = std::next( buckets.begin( ), static_cast< typename HashTableData::difference_type >( minH ) );
+        return;
     }
 
     /**
      * @return the number of elements in the hashtable
      */
-    size_t size() const { return tableSize; }
+    size_t size( ) const
+    {
+        return tableSize;
+    }
 
     /**
      * @return the number of buckets in the hashtable
      */
-    size_t bucketSize() const { return buckets.size(); }
+    size_t bucketSize( ) const
+    {
+        return buckets.size( );
+    }
 
     /**
      * @return the current load factor of the hashtable
      */
-    double loadFactor() const { return (double) tableSize / (double) buckets.size(); }
+    double loadFactor( ) const
+    {
+        return ( double ) tableSize / ( double ) buckets.size( );
+    }
 
     /**
      * @return the maximum load factor of the hashtable
      */
-    double getMaxLoadFactor() const { return maxLoadFactor; }
+    double getMaxLoadFactor( ) const
+    {
+        return maxLoadFactor;
+    }
 
     /**
      * Set the max load factor
      * @throw std::range_error if the load factor is too small
      * @param loadFactor
      */
-    void setMaxLoadFactor(double loadFactor) {
-        if (loadFactor <= 1e-9) {
-            throw std::range_error("invalid load factor!");
+    void setMaxLoadFactor( double loadFactor )
+    {
+        if ( loadFactor <= 1e-9 )
+        {
+            throw std::range_error( "invalid load factor!" );
         }
         maxLoadFactor = loadFactor;
-        rehash(buckets.size());
+        rehash( buckets.size( ) );
     }
-
 };
-
